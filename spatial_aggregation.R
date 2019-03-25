@@ -1,3 +1,5 @@
+# Spatial aggregation of WBM output (or other raster data in units: mm/day)
+# Danielle S Grogan
 # 2015-03-03 
 
 # INPUT DATA MUST BE IN MM

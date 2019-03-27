@@ -16,7 +16,8 @@ wbm_load = function(path, varname, years = NA){
   if(is.na(years) == T){
     file.list = list.files(path = path, full.names = T)
   }else{
-    file.list = list.files(path = path, full.names = T)[sapply(years, FUN = function(x) grep(pattern=x, file.list))]
+    file.list.full = list.files(path = path, full.names = T)
+    file.list = file.list.full[sapply(years, FUN = function(x) grep(pattern=x, file.list.full))]
   }
   wbm.brk = do.call(stack,
                     lapply(file.list, 

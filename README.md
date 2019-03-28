@@ -1,1 +1,4 @@
-# R_for_WBM
+# WBMr
+# This repo conatains the following functions:
+
+wbm_load.R

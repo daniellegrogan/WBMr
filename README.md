@@ -1,4 +1,14 @@
 # WBMr
-# This repo conatains the following functions:
 
+This repository conatains the following functions:
+
+WBM-specific:
 wbm_load.R
+spatial_aggregation.R
+
+General hydrology:
+NSE.R
+
+Links to other data or models:
+get_USGS_data.R
+

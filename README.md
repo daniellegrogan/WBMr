@@ -2,7 +2,7 @@
 
 This repository conatains the following functions:
 
-WBM-specific:
+WBM-specific: \n
 wbm_load.R
 spatial_aggregation.R
 

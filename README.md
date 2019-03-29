@@ -1,17 +1,19 @@
 # WBMr
 
-## This repository conatains the following functions:
+### This repository conatains the following R files:
 
 ### WBM-specific:
 
-wbm_load.R
+**wbm_load.R**
+
+Functions: wbm_load()
 - Uses the raster package to load WBM output files into R
 - Reads multiple yearly WBM files into a single raster stack
 - Only loads one variable 
 
-spatial_aggregation.R 
+**spatial_aggregation.R** 
 
-Contains four functions:
+Functions:
   1. spatial_aggregation()
   - Given gridded data and a polygon shapefile, aggregates grid values to polygons.  
   - Option: sum or average over polygons.
@@ -25,9 +27,12 @@ Contains four functions:
 
 ### General hydrology:
 
-NSE.R
+**NSE.R**
+
+Functions: NSE()
 
 ### Links to other data or models:
 
-get_USGS_data.R
+**get_USGS_data.R**
 
+Functions: get_USGS_data()

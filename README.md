@@ -36,7 +36,7 @@ linear_reg()
 
 linear_val()
 
-map_r2()
+map_r2()  *NOTE: need to make legend placement option, or at least place legend outside of map boundaries
 
 ### General hydrology:
 

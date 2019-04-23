@@ -14,6 +14,13 @@ library(rgdal)
 library(rgeos)
 
 ###################################################################################################
+mean_diff = function(x,y){
+  # x         = vector; SHOULD BE OBSERVATIONAL DATA 
+  # y         = vector; SHOULD BE MODEL DATA 
+   out = mean(x - y)
+}
+
+###################################################################################################
 linear_reg = function(x,
                       y,
                       plot.nm  = NA,
@@ -39,34 +46,41 @@ linear_reg = function(x,
   
   # Merge based on dates
   df.merge = merge(dfx, dfy, by = "DATE")
+  df.merge[df.merge < 0] = NA
+  df.merge.comp = na.omit(df.merge)
   
   # Get linear regression results
-  if(nrow(df.merge) > 0 &  # check there is data in the merged data frame
-     sum(is.na(df.merge[,2])) < nrow(df.merge) &    # check that neither column is entirely NAs
-     sum(is.na(df.merge[,3])) < nrow(df.merge) )
+  if(nrow(df.merge.comp) > 10 &  # check there are at least 10 data points in the merged data frame
+     sum(is.na(df.merge.comp[,2])) < nrow(df.merge.comp) &    # check that neither column is entirely NAs
+     sum(is.na(df.merge.comp[,3])) < nrow(df.merge.comp) &
+     sum(df.merge.comp[,2] == 0)   < nrow(df.merge.comp))     # check the obs data isn't all zeroes
     {
-    S = summary(lm(formula = df.merge[,3] ~ df.merge[,2]))  
+    S = summary(lm(formula = df.merge.comp[,3] ~ df.merge.comp[,2]))  
     intercept = S$coefficients[[1]]
     slope = S$coefficients[[2]]
     r2 = S$r.squared
-    out = c(intercept, slope, r2)
-    
+    p = coef(S)[[2,4]]
+    out = c(intercept, slope, r2, p)
+
+    # if a plot directory is given, make a plot
     if(is.na(plot.dir) == F){
-      png(file.path(plot.dir, paste(plot.nm, ".png", sep="")))
-      plot(df.merge[,3] ~ df.merge[,2],
-           xlab = "Observed", ylab = "Modeled",
-           main = plot.nm)
-      mtext(paste("R2 =", round(r2,2)))
-      abline(a=0, b=1, col='grey', lty=2)
       
-      if(is.finite(slope) == T & 
+      # check that the linear fit can be plotted
+      if(is.finite(slope) == T &   
          is.finite(intercept) == T){
+        
+        png(file.path(plot.dir, paste(plot.nm, ".png", sep="")))
+        plot(df.merge.comp[,3] ~ df.merge.comp[,2],
+             xlab = "Observed SWE (mm)", ylab = "Modeled SWE (mm)",
+             main = plot.nm)
+        mtext(paste("R2 =", round(r2,2)))
+        abline(a=0, b=1, col='grey', lty=2)
         abline(lm(df.merge[,3] ~ df.merge[,2]), col='red')
       }
       dev.off()
     }
   }else{
-    out = c(NA, NA, NA)
+    out = c(NA, NA, NA, NA)
   }
   
   return(out)
@@ -102,20 +116,36 @@ linear_val = function(mod.data,
   
   # Compare each column of mod.pts to each column of obs.data
   # linear.reg = list, each list element containing (intercept, slope, r2) of linear regression
-  st.names = sub("X", "Station_", colnames(obs.data)[2:ncol(obs.data)])
-  linear.reg =  mapply(FUN     = linear_reg,
-                      x        = obs.data[,2:ncol(obs.data)], 
-                      y        = mod.pts[,2:ncol(mod.pts)], 
-                      plot.nm  = st.names,
-                      MoreArgs = list(
-                        date.x = obs.data$DATE,
-                        date.y = mod.pts$DATE,
-                        plot.dir = plot.dir
-                        )
-                      )
+  #st.names = sub("X", "Station_", colnames(obs.data)[2:ncol(obs.data)])
+  st.names = colnames(obs.data)[2:ncol(obs.data)]
+  
+  if(ncol(obs.data) > 2){
+    linear.reg =  mapply(FUN     = linear_reg,
+                         x        = obs.data[,2:ncol(obs.data)], 
+                         y        = mod.pts[,2:ncol(mod.pts)], 
+                         plot.nm  = st.names,
+                         MoreArgs = list(
+                           date.x = obs.data$DATE,
+                           date.y = mod.pts$DATE,
+                           plot.dir = plot.dir
+                         )
+    )
+  }else{
+    linear.reg = linear_reg(x        = obs.data[,2], 
+                            y        = mod.pts[,2],
+                            plot.nm  = st.names,
+                            date.x = obs.data$DATE,
+                            date.y = mod.pts$DATE,
+                            plot.dir = plot.dir)
+  }
+
+  
+  # check if "DATE" column was used:
+  # remove.col =  which(grepl("DATE", colnames(linear.reg)))
+  # linear.reg = subset(linear.reg, select = -c(remove.col))
   
   lr.array = as.data.frame(linear.reg)
-  rownames(lr.array) = c("Intercept", "Slope", "r2")
+  rownames(lr.array) = c("Intercept", "Slope", "r2", "p_value")
   colnames(lr.array) = st.names
   
   if(is.na(out.name) == F){
@@ -125,12 +155,13 @@ linear_val = function(mod.data,
       
     }else{
       dir.create(out.name) # create directory for shape files
-      out.sp = obs.points
-      out.sp@data = as.data.frame((t(lr.array)))
-      writeOGR(out.sp, 
+      out_sp = obs.points
+      out_sp@data = as.data.frame((t(lr.array)))
+      writeOGR(out_sp, 
                dsn   = out.name, 
                layer = strsplit(out.name, "/")[[1]][length(strsplit(out.name, "/")[[1]]) ], 
-               driver="ESRI Shapefile")
+               driver="ESRI Shapefile",
+               overwrite = T)
     }
 
   }
@@ -164,12 +195,12 @@ map_r2 = function(r2.points,
        col=r2.points$Col, 
        legend=T)
   
-  legend("topleft",
+  legend("bottomright",
          title="R2",
          legend=seq(0, 0.9, by=0.1),
          col = rbPal(10),
          pch=19, 
-         cex=0.5, 
+         cex=0.7, 
          y.intersp=1, 
          bty='n')
   dev.off()
@@ -178,34 +209,40 @@ map_r2 = function(r2.points,
 }
 ###################################################################################################
 
-# # EXAMPLE: WBM simulated Snow Water Equivalent (SWE) vs ME Snow Survey observational data
+
+# # EXAMPLE: WBM simulated Snow Water Equivalent (SWE) vs GHCND observational data
 # source("/net/home/eos/dgrogan/git_repos/WBMr/wbm_load.R")
 # 
 # mod.data = wbm_load(path    = "/net/nfs/merrimack/raid/data/WBM_USNE/livneh/daily",
 #                     varname = "snowPack",
 #                     years   = seq(from = 1950, to = 2013))
-# obs.points = readOGR("SWE_data/SWE_data_formatted/ME_snow_survey/ME_snow_survey_stations/", "ME_snow_survey_stations")
+# obs.points = readOGR("SWE_data/SWE_data_formatted/GHCND/GHCND_stations", "GHCND_stations")
 # crs(obs.points) = "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0 "
-# obs.data   = read.delim("SWE_data/SWE_data_formatted/ME_snow_survey/ME_snow_survey_SWE.csv", header=T, sep=",")
+# obs.data   = read.delim("SWE_data/SWE_data_formatted/GHCND/GHCND_SWE.csv", header=T, sep=",")
 # # out.name  = "/net/nfs/yukon/raid5/projects/Vernal_Windows/validation/test/test_val.csv"
-# out.name   = "/net/nfs/yukon/raid5/projects/Vernal_Windows/validation/test"
+# out.name   = "/net/nfs/yukon/raid5/projects/Vernal_Windows/validation/SWE_Validation/GHCN_SWE"
 # out.sp     = T
-# plot.dir   = "/net/nfs/yukon/raid5/projects/Vernal_Windows/validation/test_figures"
+# plot.dir   = "/net/nfs/yukon/raid5/projects/Vernal_Windows/validation/SWE_Validation/Figures"
 # 
-# linear_val(mod.data, 
-#            obs.points, 
-#            obs.data, 
-#            out.name, 
+# linear_val(mod.data,
+#            obs.points,
+#            obs.data,
+#            out.name,
 #            out.sp,
 #            plot.dir)
+# 
 # 
 # # map r2 values
 # states    = readOGR("/net/nfs/squam/raid/userdata/dgrogan/data/map_data/cb_2015_us_state_500k/", "cb_2015_us_state_500k")
 # provinces = readOGR("/net/nfs/squam/raid/userdata/dgrogan/data/map_data/Canada/", "Canada")
 # provinces = spTransform(provinces, CRSobj = crs(states))
 # us.canada = raster::union(states, provinces)
-# r2.points = readOGR("/net/nfs/yukon/raid5/projects/Vernal_Windows/validation/test", "test")
+# r2.points = readOGR("/net/nfs/yukon/raid5/projects/Vernal_Windows/validation/SWE_Validation/GHCN_SWE", "GHCN_SWE")
 # 
-# map_r2(r2.points, 
+# # subset to r2 points that have significant p-values
+# r2.sub = subset(r2.points, r2.points$p_value < 0.01)
+# 
+# map_r2(r2.points,
 #        sp.map = us.canada,
-#        plot.nm = "/net/nfs/yukon/raid5/projects/Vernal_Windows/validation/test_figures/map.png")
+#        plot.nm = "/net/nfs/yukon/raid5/projects/Vernal_Windows/validation/SWE_Validation/Figures/GHCN_map.png")
+

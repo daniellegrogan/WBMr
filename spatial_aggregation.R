@@ -33,7 +33,7 @@ spatial_aggregation<-function(raster.data, shapefile, s = 1, cell.area = 1, weig
     mm_to_km = 10^-6
     raster.data[is.na(raster.data)]<-c(0)
     data.km3<-overlay(raster.data, cell.area, fun=function(x,y){return(mm_to_km * x * y)}) 
-    data.out<-extract(data.km3, shapefile, fun=sum, na.rm=T, sp=poly.out)
+    data.out<-raster::extract(data.km3, shapefile, fun=sum, na.rm=T, sp=poly.out)
   }else{ # output mean (mm)
     data.out<-extract(raster.data, shapefile, fun=mean, weights = weight, na.rm=T, sp=poly.out)
   }

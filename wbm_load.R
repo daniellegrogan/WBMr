@@ -21,7 +21,7 @@ wbm_load = function(path, varname, years = NA){
   }
   wbm.brk = do.call(stack,
                     lapply(file.list, 
-                           brick, 
+                           raster::brick, 
                            varname = varname)
   )
   return(wbm.brk)

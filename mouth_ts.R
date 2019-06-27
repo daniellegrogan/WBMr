@@ -44,8 +44,8 @@ id_mouth = function(basin.ID, ID, up.area){
 }
 
 ############################################################################################################
-mouth_ts = function(basin.ID,      # basin ID file (ascii grid of basin IDs)
-                    ID,            # ID of the basin for which you want data from the mouth
+mouth_ts = function(ID,            # ID of the basin for which you want data from the mouth
+                    basin.ID,      # basin ID file (ascii grid of basin IDs)
                     up.area,       # upstream area file (ascii grid)
                     path,          # path to wbm output files
                     varname,       # variable name in wbm output file to extract

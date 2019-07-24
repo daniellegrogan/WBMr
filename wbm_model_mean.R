@@ -6,7 +6,7 @@
 # Danielle S Grogan
 # Last updated 2019-07-23
 
-wbm_model_mean = function(file.path.list   # list of file paths (character strings) from which to read WBM files
+wbm_model_mean = function(file.path.list,   # list of file paths (character strings) from which to read WBM files
                           yrs,             # vector of years, or NA
                           out.dir,         # character string: directory to which to write output. if NA, no file written
                           out.nm,          # character string; name for new file

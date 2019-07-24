@@ -6,13 +6,11 @@
 # Danielle S Grogan
 # Last updated 2019-07-23
 
-wbm_model_mean = function(file.path.list,   # list of file paths (character strings) from which to read WBM files
+wbm_model_mean = function(file.path.list, # list of file paths (character strings) from which to read WBM files
                           yrs,             # vector of years, or NA
                           out.dir,         # character string: directory to which to write output. if NA, no file written
                           out.nm,          # character string; name for new file
-                          ret = 1          # 1 or 0; if 1, function returns the raster or brick result.  If 0, no return value
-                          ){
-  
+                          ret = 1){        # 1 or 0; if 1, function returns the raster or brick result.  If 0, no return value
   brk = do.call(stack,
                 lapply(file.path.list,
                        FUN = function(x) wbm_load(x, varname = varname, years = yrs)))

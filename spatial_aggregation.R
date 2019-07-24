@@ -73,14 +73,14 @@ global.sum.stack<-function(brick.data, km3.out=1, cell.area = 1){
   
   if(length(cell.area)==1){
     #print("cell.area calculated from raster.data")
-    cell.area<-area(brick.data) # unit: km2.  
+    cell.area<-subset(area(brick.data),1) # unit: km2.  
   }
   
   mm_to_km = 10^-6
   km3.yr.grid<-overlay(brick.data, cell.area, fun=function(x,y){x*y*mm_to_km})
-  data.out<-mat.or.vec(nr=nlayers(data),nc=1)
+  data.out<-mat.or.vec(nr=nlayers(brick.data),nc=1)
   if(km3.out == 1){ # output km3/yr sum
-    for(i in 1:nlayers(data)){
+    for(i in 1:nlayers(brick.data)){
       data.out[i]<-sum(as.matrix(subset(km3.yr.grid, i)), na.rm=T)
     }
   }else{ # output as mm/yr mean

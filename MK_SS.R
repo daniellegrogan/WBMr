@@ -9,9 +9,9 @@ library(Kendall)
 library(trend)
 
 ########################################################################################
-MK_SS = function(ts.data  # vector of values, with row names as years (or other time step)
-                 ){
-  TS = ts(data = as.numeric(ts.data), start = min(as.numeric(names(ts.data))), end = max(as.numeric(names(ts.data))), frequency = 1)
+MK_SS = function(yr,         # sequence of years
+                 ts.data){   # vector of values
+  TS = ts(data = as.numeric(ts.data), start = min(yr), end = max(yr), frequency = 1)
   MK = MannKendall(TS)
   SS = sens.slope(TS)
   

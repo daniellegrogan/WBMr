@@ -55,11 +55,11 @@ global.sum<-function(raster.data, km3.out=1, cell.area = 1){
     mm_to_km = 10^-6
     km3.yr.grid<-overlay(raster.data, cell.area, fun=function(x,y){x*y*mm_to_km})
     if(km3.out == 1){ # output km3/yr sum
-      data.out = sum(as.matrix(km3.yr.grid), na.rm=T)
+      data.out = cellStats(km3.yr.grid, stat='sum',  na.rm=TRUE)
       
     }else{ # output as mm/yr mean
       cell.weights = cell.area/max(as.matrix(cell.area))
-      data.out = sum(as.matrix(raster.data*cell.weights), na.rm=T)  # area-weights the mm value of each grid cell
+      cellStats(raster.data*cell.weights, stat='sum',  na.rm=TRUE)   # area-weights the mm value of each grid cell
     }
 
   data.out

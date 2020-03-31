@@ -41,7 +41,7 @@ flowlines<-function(flowdir, basinID=NA, uparea=NA, region=NA, out.loc, out.name
   
   # make a raster set of beginning coordinates
   begin.coord <- data.frame(coordinates(flowdir))
-  begin.coord.r<-raster(nrows=nrow(flowdir), ncols=ncol(flowdir), res=0.1)
+  begin.coord.r<-raster(nrows=nrow(flowdir), ncols=ncol(flowdir), res = res(flowdir)[1])
   begin.coord.r<-crop(begin.coord.r, flowdir)
   if(is.na(region)==F){
   begin.coord.r<-crop(begin.coord.r, region)

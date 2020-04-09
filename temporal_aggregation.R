@@ -75,7 +75,7 @@ temp.agg<-function(file.path, file.nm.pre, cumulative=1, agg.from, agg.to, varna
   if(agg.to == 'yearly'){
     for(y in start.year:end.year){
       year=y
-      file.nm<-paste(file.path, file.nm.pre, year, "_.nc", sep="")
+      file.nm<-paste(file.path, file.nm.pre, year, ".nc", sep="")
       data<-brick(file.nm, varname=varname)
       
       # cumulative aggregation

@@ -10,7 +10,8 @@
 raster_monthly_ave = function(brk.data,        # a raster brick or raster stack
                               out.dir = NA,    # character string; dirctory to which to write output. If NA, then no file is written
                               out.nm,          # character string; file name for output
-                              r = 1){          # 1 or 0; 1 will return result as brick, 0 will not
+                              r = 1,           # 1 or 0; 1 will return result as brick, 0 will not
+                              overwrite = 0){  # 1 or 0: 1 will over-write, 0 will not        
   
   # make indices for aggregating
   ind = rep(seq(1:12), nlayers(brk.data)/12)
@@ -19,8 +20,15 @@ raster_monthly_ave = function(brk.data,        # a raster brick or raster stack
   if(is.na(out.dir)){
     brk.agg = stackApply(brk.data, indices = ind, fun = mean)
   }else{
-    brk.agg = stackApply(brk.data, indices = ind, fun = mean,
-                         filename = file.path(out.dir, out.nm))
+    filename = file.path(out.dir, out.nm)
+    if((overwrite == 0 & !file.exists(filename)) | overwrite == 1){
+      if(!file.exists(filename)){
+        brk.agg = stackApply(brk.data, indices = ind, fun = mean,
+                             filename = file.path(out.dir, out.nm), 
+                             overwrite = T)
+      }
+    }
+    
   }
   
   if(r == 1){

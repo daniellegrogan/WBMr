@@ -10,7 +10,7 @@ raster_time_ave = function(brk.data,        # a raster brick or raster stack
                            time.step,       # integer; time step over which to aggregate, e.g., 10 (will aggregate 10 layers)
                            start.lyr = 1,   # integer; the brick or stack layer at which to begin aggregation
                            s = 1,           # 1 or 0; 1 will sum, 0 will average
-                           our.dir = NA,    # character string; dirctory to which to write output. If NA, then no file is written
+                           out.dir = NA,    # character string; dirctory to which to write output. If NA, then no file is written
                            out.nm,          # character string; file name for output
                            r = 1){          # 1 or 0; 1 will return result as brick, 0 will not
   

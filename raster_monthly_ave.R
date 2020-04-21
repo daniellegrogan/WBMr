@@ -8,7 +8,7 @@
 
 
 raster_monthly_ave = function(brk.data,        # a raster brick or raster stack
-                              our.dir = NA,    # character string; dirctory to which to write output. If NA, then no file is written
+                              out.dir = NA,    # character string; dirctory to which to write output. If NA, then no file is written
                               out.nm,          # character string; file name for output
                               r = 1){          # 1 or 0; 1 will return result as brick, 0 will not
   

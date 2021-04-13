@@ -8,26 +8,12 @@
 # 2019-06-25
 
 library(raster)
-############################################################################################################
-wbm_load = function(path, varname, years = NA){
-  # path     = character string; file path to model output
-  # varname  = character string; variable name to load 
-  # years    = vector or NA; 
-  #            vector: sequence of years of model data to read if you don't want to read ALL files in file path
-  
-  if(is.na(years) == T){
-    file.list = list.files(path = path, full.names = T)
-  }else{
-    file.list.full = list.files(path = path, full.names = T)
-    file.list = file.list.full[sapply(years, FUN = function(x) grep(pattern=x, file.list.full))]
-  }
-  wbm.brk = do.call(stack,
-                    lapply(file.list, 
-                           raster::brick, 
-                           varname = varname)
-  )
-  return(wbm.brk)
-}
+library(RCurl)  # enables sourcing R code from github
+
+# wbm_load()
+wbm_load.script = getURL("https://raw.githubusercontent.com/daniellegrogan/WBMr/master/wbm_load.R", ssl.verifypeer=F)
+eval(parse(text=wbm_load.script))
+
 ############################################################################################################
 id_mouth = function(basin.ID, ID, up.area){
   basin.up<-((basin.ID==ID)*up.area)
@@ -49,12 +35,16 @@ mouth_ts = function(ID,            # ID of the basin for which you want data fro
                     up.area,       # upstream area file (ascii grid)
                     path,          # path to wbm output files
                     varname,       # variable name in wbm output file to extract
-                    yrs){          # years of wbm output to extract
+                    yrs,           # years of wbm output to extract
+                    monthly.files = 0 #  binary: 1 or 0 indicating the structure of WBM output files for monthly time series
+                                          # 0 := files are 1 file per year, 12 layers (temporal aggregate of WBM daily output)
+                                          # 1 := files are 1 file per month, with file structure montyly/YYYY/YYYY-MM.nc
+                    ){         
     
   
-  wbm.data = wbm_load(path, varname, yrs)  # load wbm data
-  pt = id_mouth(basin.ID, ID, up.area)     # identify basin mouth point
-  data.mouth = extract(wbm.data, pt)       # extract wbm data from basin mouth point
+  wbm.data = wbm_load(path, varname, yrs, monthly.files)  # load wbm data
+  pt = id_mouth(basin.ID, ID, up.area)                    # identify basin mouth point
+  data.mouth = extract(wbm.data, pt)                      # extract wbm data from basin mouth point
   data.mouth                 
 }
 

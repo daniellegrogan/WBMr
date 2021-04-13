@@ -16,7 +16,7 @@ library(rgdal)  # IMPORTANT: THIS CODE ONLY WORKS WITH THE MOST RECENT VERSION O
 # update.packages("rgdal")  # checks for most recent version of rgdal
 
 ###################################################################################################
-spatial_aggregation<-function(raster.data, shapefile, s = 1, cell.area = 1, weight = T, poly.out = T){
+spatial_aggregation<-function(raster.data, shapefile, s = 1, cell.area = 1, weight = T, poly.out = T, na.rm=T){
   # raster.data = raster (or brick?) of data in mm
   # shapefile   = shapefile with polygons
   # s: set to 1 for sum over area, 0 for mean (mm) over area
@@ -35,7 +35,7 @@ spatial_aggregation<-function(raster.data, shapefile, s = 1, cell.area = 1, weig
     data.km3<-overlay(raster.data, cell.area, fun=function(x,y){return(mm_to_km * x * y)}) 
     data.out<-raster::extract(data.km3, shapefile, fun=sum, na.rm=T, sp=poly.out)
   }else{ # output mean (mm)
-    data.out<-extract(raster.data, shapefile, fun=mean, weights = weight, na.rm=T, sp=poly.out)
+    data.out<-raster::extract(raster.data, shapefile, fun=mean, weights = weight, na.rm=T, sp=poly.out)
   }
   data.out
 }

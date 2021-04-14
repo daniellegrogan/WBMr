@@ -22,7 +22,8 @@ mouth_ts_basins = function(basin.ID.list,     # list of basin ID values. Typical
                            path,              # character string: path to wbm output (directory with .nc files in it)
                            monthly.files = 0, # 0 or 1: 0 indicates WBM output .nc files are annual, with all years in one directory. 1 indicates one file per month, with years in separate directories 
                            varname,           # character string: variable to extract from basin mouth points
-                           yrs                # years of wbm output to extract
+                           yrs,               # years of wbm output to extract
+                           out.nm = NA        # optional name to save output
 ){
   out.table = data.frame(matrix(nr=length(basin.ID.list), nc=length(yrs)))
   rownames(out.table) = basin.ID.list
@@ -35,6 +36,10 @@ mouth_ts_basins = function(basin.ID.list,     # list of basin ID values. Typical
                               varname,            # variable name in wbm output file to extract
                               yrs,                # years of wbm output to extract
                               monthly.files)      # monthly wbm output files (1 or 0) 
+  }
+  if(!is.na(out.nm)){
+    write.csv(out.table, out.nm)
+    print(paste(out.nm, "written to file"))
   }
   return(out.table)
 }

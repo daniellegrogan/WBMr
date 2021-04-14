@@ -36,5 +36,5 @@ mouth_ts_basins = function(basin.ID.list,     # list of basin ID values. Typical
                               yrs,                # years of wbm output to extract
                               monthly.files)      # monthly wbm output files (1 or 0) 
   }
-  out.table
+  return(out.table)
 }

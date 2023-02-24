@@ -20,7 +20,6 @@ mouth_ts_basins = function(basin.ID.list,     # list of basin ID values. Typical
                            basin.ID.grid,     # grid acsii file giving the ID value for each grid cell
                            up.area,           # upstream area file (ascii grid)
                            path,              # character string: path to wbm output (directory with .nc files in it)
-                           monthly.files = 0, # 0 or 1: 0 indicates WBM output .nc files are annual, with all years in one directory. 1 indicates one file per month, with years in separate directories 
                            varname,           # character string: variable to extract from basin mouth points
                            yrs,               # years of wbm output to extract
                            out.nm = NA        # optional name to save output

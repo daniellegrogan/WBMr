@@ -34,8 +34,8 @@ mouth_ts_basins = function(basin.ID.list,     # list of basin ID values. Typical
                               up.area,            # upstream area file (ascii grid)
                               path,               # path to wbm output
                               varname,            # variable name in wbm output file to extract
-                              yrs,                # years of wbm output to extract
-                              monthly.files)      # monthly wbm output files (1 or 0) 
+                              yrs)                # years of wbm output to extract
+
   }
   if(!is.na(out.nm)){
     write.csv(out.table, out.nm)

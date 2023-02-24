@@ -47,7 +47,7 @@ mouth_ts_basins_annual = function(basin.ID.list,     # list of basin ID values. 
 
 
 ### Monthly values
-mouth_ts_basins_annual = function(basin.ID.list,     # list of basin ID values. Typically numeric, but could be character string. Must match basin_ID_grid file
+mouth_ts_basins_monthly = function(basin.ID.list,     # list of basin ID values. Typically numeric, but could be character string. Must match basin_ID_grid file
                                   basin.ID.grid,     # grid acsii file giving the ID value for each grid cell
                                   up.area,           # upstream area file (ascii grid)
                                   path,              # character string: path to wbm output (directory with .nc files in it)

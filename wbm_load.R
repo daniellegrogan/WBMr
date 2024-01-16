@@ -3,7 +3,8 @@
 # R for WBM
 # Load WBM data as brick
 # Danielle S Grogan
-# 2019-03-27
+
+# 2024-01-16 UPDATED TO USE TERRA PACKAGE   
 
 library(raster)
 
@@ -21,10 +22,7 @@ wbm_load = function(path, varname, years = NA){
       file.list = file.list.full[unlist(sapply(years, FUN = function(x) grep(pattern=paste("wbm_",x, sep=""), file.list.full)))]
     }
 
-  wbm.brk = do.call(stack,
-                    lapply(file.list, 
-                           raster::brick, 
-                           varname = varname)
-  )
-  return(wbm.brk)
+  wbm.out = terra::rast(file.list, subds=1)
+  
+  return(wbm.out)
 }

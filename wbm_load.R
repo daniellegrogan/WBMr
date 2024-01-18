@@ -22,7 +22,8 @@ wbm_load = function(path, varname, years = NA){
       file.list = file.list.full[unlist(sapply(years, FUN = function(x) grep(pattern=paste("wbm_",x, sep=""), file.list.full)))]
     }
 
-  wbm.out = terra::rast(file.list, lyrs = varname)
+  wbm.all = terra::rast(file.list) # loads all variables
+  wbm.out = wbm.all[[which(names(wbm.all) == varname)]]  # subsets to only variable of interest
   
   return(wbm.out)
 }

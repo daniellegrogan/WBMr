@@ -6,7 +6,7 @@
 
 # 2024-01-16 UPDATED TO USE TERRA PACKAGE   
 
-library(raster)
+library(terra)
 
 wbm_load = function(path, varname, years = NA){
   # path     = character string; file path to model output
@@ -22,7 +22,7 @@ wbm_load = function(path, varname, years = NA){
       file.list = file.list.full[unlist(sapply(years, FUN = function(x) grep(pattern=paste("wbm_",x, sep=""), file.list.full)))]
     }
 
-  wbm.out = terra::rast(file.list, subds=1)
+  wbm.out = terra::rast(file.list, lyrs = varname)
   
   return(wbm.out)
 }

@@ -25,10 +25,10 @@ spatial_aggregation<-function(raster.data, shapefile, s = 1){
     cell.area = terra::cellSize(raster.data, unit = 'km') # unit: km2.  
     mm_to_km = 10^-6
     data.km3 = raster.data * cell.area * mm_to_km
-    data.out = terra::extract(data.km3, shapefile, fun=sum)
+    data.out = terra::extract(data.km3, shapefile, fun=sum, na.rm=T)
     
   }else{ # output mean (mm)
-    data.out = terra::extract(raster.data, shapefile, fun=mean)
+    data.out = terra::extract(raster.data, shapefile, fun=mean, na.rm=T)
   }
   data.out
 }

@@ -1,4 +1,14 @@
-function(path, varname, years = NA){
+# wbm_load.R
+
+# R for WBM
+# Load WBM data as brick
+# Danielle S Grogan
+
+# 2024-01-16 UPDATED TO USE TERRA PACKAGE   
+
+library(terra)
+
+wbm_load = function(path, varname, years = NA){
   # path     = character string; file path to model output
   # varname  = character string; variable name to load 
   # years    = vector or NA; 
@@ -12,16 +22,7 @@ function(path, varname, years = NA){
       file.list = file.list.full[unlist(sapply(years, FUN = function(x) grep(pattern=paste("wbm_",x, sep=""), file.list.full)))]
     }
 
-  wbm.all = terra::rast(file.list) # loads all variables
-  
-  # wbm.all will include "_sigma" vars.  Subset to only vars of interest:
-  if(grepl("yearly", path)){
-    wbm.out = wbm.all[[which(names(wbm.all) == varname)]]  # subsets to only variable of interest
-  }else if(grepl("monthly", path)){
-    wbm.out = wbm.all[[which(names(wbm.all) %in% paste(varname, seq(1,12), sep="_"))]]  # subsets to only variable of interest
-  }else if(grepl("daily", path)){
-    wbm.out = wbm.all[[which(names(wbm.all) %in% paste(varname, seq(1,365), sep="_"))]]  # subsets to only variable of interest
-  }
+  wbm.out = terra::rast(file.list, subds = varname) 
 
   return(wbm.out)
 }

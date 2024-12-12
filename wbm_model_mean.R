@@ -4,34 +4,40 @@
 # Function is useful for making multi-model means for WBM run by an ensemble of GCMs
 
 # Danielle S Grogan
-# Last updated 2019-07-23
+# updated by Becker Gibson 11/20/2024
 
-wbm_model_mean = function(file.path.list, # list of file paths (character strings) from which to read WBM files
-                          yrs,             # vector of years, or NA
-                          out.dir,         # character string: directory to which to write output. if NA, no file written
-                          out.nm,          # character string; name for new file
-                          ret = 1){        # 1 or 0; if 1, function returns the raster or brick result.  If 0, no return value
-  brk = do.call(stack,
-                lapply(file.path.list,
-                       FUN = function(x) wbm_load(x, varname = varname, years = yrs)))
+# source wbm_load function
+source("https://raw.githubusercontent.com/daniellegrogan/WBMr/refs/heads/master/wbm_load.R")
+
+wbm_model_mean <- function(
+    file.path.list,  # list of file paths (character strings) from which to read WBM files
+    yrs,             # vector of years, or NA
+    var,             # character string: name for variable to average
+    out.dir = NA,    # character string: directory to which to write output. if NA, no file written
+    out.nm = NA,     # character string; name for new file - include file extension - .CDF suggested
+    ret = 1          # 1 or 0; if 1, function returns the raster result.  If 0, no return value
+){        
+  rast.list <- do.call(c, lapply(file.path.list, FUN = \(x) wbm_load(x, varname = var, years = yrs)))
   
-  ids = rep(seq(1:(nlayers(brk)/length(gcm.list))), length(gcm.list))
-  if(is.na(out.dir)){
-    brk.mmm = stackApply(brk, 
-                         indices = ids, 
-                         fun = mean)
-  }else{
-    brk.mmm = stackApply(brk, 
-                         indices = ids, 
-                         fun = mean,
-                         filename = file.path(out.dir, out.nm),
-                         overwrite = T)
+  ids <- rep(seq(1:(terra::nlyr(rast.list)/length(file.path.list))), length(file.path.list))
+  
+  if (is.na(out.dir)){
+    rast.list.mmm <- terra::tapp(
+      rast.list, 
+      index = ids, 
+      fun = mean,
+      na.rm = T)
+  } else {
+    rast.list.mmm <- terra::tapp(
+      rast.list, 
+      index = ids, 
+      fun = mean,
+      overwrite = T,
+      na.rm = T)
+    terra::writeRaster(rast.list.mmm, filename = file.path(out.dir, out.nm), overwrite = T)
   }
   
   if(ret == 1){
-    return(brk.mmm)
+    return(rast.list.mmm)
   }
-
 }
-
-
